@@ -211,4 +211,70 @@ public class Sorting {
       A[j + h] = insItem;
     }
   }
+
+  // 계수 정렬
+  public int[] countingSort(int K) {
+    int[] cnt = new int[K];
+
+    for (int i = 0; i < K; i++) {
+      cnt[i] = 0;
+    }
+
+    for (int i = 0; i < A.length; i++) {
+      cnt[A[i]]++;
+    }
+
+    cnt[0]--;
+
+    for (int i = 1; i < K; i++) {
+      cnt[i] += cnt[i - 1];
+    }
+
+    int[] B = new int[A.length];
+
+    for (int j = A.length - 1; j >= 0; j--) {
+      B[cnt[A[j]]] = A[j];
+      cnt[A[j]]--;
+    }
+
+    return B;
+  }
+
+  // 기수 정렬
+  public void radixSort() {
+    int[] cnt = new int[10];
+    int[] start = new int[10];
+    int[] B = new int[A.length];
+    int max = -1;
+
+    for (int i = 0; i < A.length; i++) {
+      if (A[i] > max) {
+        max = A[i];
+      }
+    }
+
+    int numDigits = (int)Math.log10(max) + 1;
+
+    for (int digit = 1; digit <= numDigits; digit++) {
+      for (int d= 0; d <= 9; d++) {
+        cnt[d] = 0;
+      }
+      for (int i = 0; i < A.length; i++) {
+        cnt[(int)(A[i] / Math.pow(10, digit - 1)) % 10]++;
+      }
+
+      start[0] = 0;
+
+      for (int d = 1; d <= 9; d++) {
+        start[d] = start[d - 1] + cnt[d - 1];
+      }
+      for (int i = 0; i < A.length; i++) {
+        B[start[(int)(A[i] / Math.pow(10, digit - 1)) % 10]++] = A[i];
+      }
+      
+      for (int i = 0; i < A.length; i++) {
+        A[i] = B[i];
+      }
+    }
+  }
 }
