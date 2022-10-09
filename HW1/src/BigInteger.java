@@ -6,16 +6,13 @@ import java.util.regex.Pattern;
 public class BigInteger {
     public static final String QUIT_COMMAND = "quit";
     public static final String MSG_INVALID_INPUT = "입력이 잘못되었습니다.";
-  
-    // implement this
-    public static final Pattern EXPRESSION_PATTERN = Pattern.compile("");
+
+    public static final String NUMBER_PATTERN = "\\s*(\\+|\\-*)([0-9]+)\\s*";
+    public static final String OP_PATTERN = "(\\+|\\-|\\*|/)";
+    public static final Pattern EXPRESSION_PATTERN = Pattern.compile(NUMBER_PATTERN + OP_PATTERN + NUMBER_PATTERN);
 
     char[] value;
     boolean isPlus;
-  
-    public BigInteger() {
-        this.value = new char[1];
-    }
 
     public BigInteger(char[] s, boolean isPlus) {
         this.value = s;
@@ -56,15 +53,14 @@ public class BigInteger {
 
         char[] result = new char[arr[arr.length - 1] == 0 ? arr.length - 1 : arr.length];
 
-        for (int i = 0; i < result.length;i++) {
-            result[i] = (char)(arr[result.length - 1 - i]+'0');
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (char) (arr[result.length - 1 - i] + '0');
         }
 
         return new BigInteger(result, isPlus);
     }
 
-    public BigInteger add(BigInteger big)
-    {
+    public BigInteger add(BigInteger big) {
         if (!this.isPlus && big.isPlus) {
             return big.subtract(this.toggleSign()); // +big - +this
         }
@@ -76,8 +72,7 @@ public class BigInteger {
         return this.addImpl(big); // +this + +big or -this + -big
     }
 
-    private BigInteger subtractImpl(BigInteger big)
-    {
+    private BigInteger subtractImpl(BigInteger big) {
         int[] arr = new int[Math.max(this.value.length, big.value.length)];
 
         for (int i = 0; i < this.value.length; i++) {
@@ -98,10 +93,10 @@ public class BigInteger {
 
         for (int i = 0; i < arr.length; i++) {
             if (isPlus && arr[i] < 0) {
-                arr[i+1]--;
+                arr[i + 1]--;
                 arr[i] = 10 + arr[i];
             } else if (!isPlus && arr[i] > 0) {
-                arr[i+1]++;
+                arr[i + 1]++;
                 arr[i] = -10 + arr[i];
             }
         }
@@ -115,15 +110,14 @@ public class BigInteger {
 
         char[] result = new char[length];
 
-        for (int i = 0; i < result.length;i++) {
-            result[i] = (char)(Math.abs(arr[result.length - 1 - i])+'0');
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (char) (Math.abs(arr[result.length - 1 - i]) + '0');
         }
 
         return new BigInteger(result, isPlus);
     }
-  
-    public BigInteger subtract(BigInteger big)
-    {
+
+    public BigInteger subtract(BigInteger big) {
         if ((this.isPlus && !big.isPlus) || (!this.isPlus && big.isPlus)) {
             return this.add(big.toggleSign()); // +this + +big or -this + -big
         }
@@ -134,16 +128,16 @@ public class BigInteger {
 
         return this.subtractImpl(big); // +this - +big
     }
-  
-    public BigInteger multiply(BigInteger big)
-    {
+
+    public BigInteger multiply(BigInteger big) {
         boolean isPlus = this.isPlus && big.isPlus || !this.isPlus && !big.isPlus;
 
         int[] arr = new int[this.value.length + big.value.length];
 
         for (int i = 0; i < this.value.length; i++) {
             for (int j = 0; j < big.value.length; j++) {
-                arr[i+j] = arr[i+j] + Character.getNumericValue(this.value[i]) * Character.getNumericValue(big.value[j]);
+                arr[i + j] = arr[i + j]
+                        + Character.getNumericValue(this.value[i]) * Character.getNumericValue(big.value[j]);
             }
         }
 
@@ -169,8 +163,8 @@ public class BigInteger {
 
         char[] result = new char[length];
 
-        for (int i = 0; i < result.length;i++) {
-            result[i] = (char)(Math.abs(arr[result.length - 1 - i])+'0');
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (char) (Math.abs(arr[result.length - 1 - i]) + '0');
         }
 
         return new BigInteger(result, isPlus);
@@ -212,9 +206,8 @@ public class BigInteger {
 
         throw new Exception();
     }
-  
-    static BigInteger evaluate(String input) throws Exception
-    {
+
+    static BigInteger evaluate(String input) throws Exception {
         String numberPattern = "\\s*(\\+|\\-*)([0-9]+)\\s*";
         String opPattern = "(\\+|\\-|\\*|/)";
 
@@ -225,7 +218,7 @@ public class BigInteger {
         if (b) {
             Operator op = getOperator(m.group(3));
 
-            String firstSign = m.group(1) == "" ? "+" : m.group(1); 
+            String firstSign = m.group(1) == "" ? "+" : m.group(1);
             String firstNumber = m.group(2);
             String secondSign = m.group(4) == "" ? "+" : m.group(4);
             String secondNumber = m.group(5);
@@ -233,12 +226,12 @@ public class BigInteger {
             char[] firstArr = firstNumber.toCharArray();
             char[] secondArr = secondNumber.toCharArray();
 
-            for(int i = 0; i < firstArr.length / 2; i++) {
+            for (int i = 0; i < firstArr.length / 2; i++) {
                 char temp = firstArr[i];
                 firstArr[i] = firstArr[firstArr.length - i - 1];
                 firstArr[firstArr.length - i - 1] = temp;
             }
-            for(int i = 0; i < secondArr.length / 2; i++) {
+            for (int i = 0; i < secondArr.length / 2; i++) {
                 char temp = secondArr[i];
                 secondArr[i] = secondArr[secondArr.length - i - 1];
                 secondArr[secondArr.length - i - 1] = temp;
@@ -254,24 +247,17 @@ public class BigInteger {
 
         throw new Exception();
     }
-  
-    public static void main(String[] args) throws Exception
-    {
-        try (InputStreamReader isr = new InputStreamReader(System.in))
-        {
-            try (BufferedReader reader = new BufferedReader(isr))
-            {
+
+    public static void main(String[] args) throws Exception {
+        try (InputStreamReader isr = new InputStreamReader(System.in)) {
+            try (BufferedReader reader = new BufferedReader(isr)) {
                 boolean done = false;
-                while (!done)
-                {
+                while (!done) {
                     String input = reader.readLine();
-  
-                    try
-                    {
+
+                    try {
                         done = processInput(input);
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         System.out.println(e);
                         System.err.println(MSG_INVALID_INPUT);
                     }
@@ -279,26 +265,21 @@ public class BigInteger {
             }
         }
     }
-  
-    static boolean processInput(String input) throws Exception
-    {
+
+    static boolean processInput(String input) throws Exception {
         boolean quit = isQuitCmd(input);
-  
-        if (quit)
-        {
+
+        if (quit) {
             return true;
-        }
-        else
-        {
+        } else {
             BigInteger result = evaluate(input);
             System.out.println(result.toString());
-  
+
             return false;
         }
     }
-  
-    static boolean isQuitCmd(String input)
-    {
+
+    static boolean isQuitCmd(String input) {
         return input.equalsIgnoreCase(QUIT_COMMAND);
     }
 }
