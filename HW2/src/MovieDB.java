@@ -1,5 +1,4 @@
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * Genre, Title 을 관리하는 영화 데이터베이스.
@@ -45,13 +44,14 @@ public class MovieDB {
 
 			while(genreIdx > 0) {
 				target = target.getNext();
+				genreIdx--;
 			}
 
 			MyLinkedList<String> list = target.getItem();
 
 
 			Node<String> cursor = list.head;
-			while (cursor.getNext() != null && cursor.getNext().getItem().compareTo(title) < 0) {
+			while (cursor.getNext() != null && cursor.getNext().getItem().compareTo(title) <= 0) {
 				cursor = cursor.getNext();
 			}
 
@@ -68,12 +68,33 @@ public class MovieDB {
     }
 
     public void delete(MovieDBItem item) {
-        // FIXME implement this
-        // Remove the given item from the MovieDB.
+			// FIXME implement this
+			// Remove the given item from the MovieDB.
+			int genreIdx = this.getGenreIndex(item.getGenre());
+			String title = item.getTitle();
+
+			Node<MyLinkedList<String>> target = list.head.getNext();
+
+			while(genreIdx > 0) {
+				target = target.getNext();
+			}
+
+			MyLinkedList<String> list = target.getItem();
+
+			Node<String> cursor = list.head;
+			while (cursor.getNext() != null && cursor.getNext().getItem().compareTo(title) == 0) {
+				cursor = cursor.getNext();
+			}
+
+			if (cursor.getNext() == null) {
+				return;
+			}
+
+			cursor.setNext(cursor.getNext().getNext());
     	
     	// Printing functionality is provided for the sake of debugging.
-        // This code should be removed before submitting your work.
-        System.err.printf("[trace] MovieDB: DELETE [%s] [%s]\n", item.getGenre(), item.getTitle());
+			// This code should be removed before submitting your work.
+			System.err.printf("[trace] MovieDB: DELETE [%s] [%s]\n", item.getGenre(), item.getTitle());
     }
 
     public MyLinkedList<MovieDBItem> search(String term) {
